@@ -1,24 +1,30 @@
 import React, { Component } from 'react';
+import { fetchImages } from '../api';
 import '../../src/styles.css';
-import * as API from '../api';
 import { Searchbar } from './Searchbar';
 import { ImageGallery } from './ImageGallery';
 
 export class App extends Component {
   state = {
-    photos: [
-      (id = ''),
-      (webformatURL = ''),
-      (largeImageURL = '')
-    ],
+    photos: [],
   };
 
-  addPhoto(values) {}
+handleSearch = async (searchQuery) => {
+  try {
+    const images = await fetchImages(searchQuery); 
+    this.setState({ photos: images, searchQuery}); 
+  } catch (error) {
+    console.error('Ошибка при запросе:', error);
+  }
+}
+
+ 
+
   render() {
     return (
       <div className="App">
-        <Searchbar />
-        <ImageGallery />
+        <Searchbar handleSearch={this.handleSearch}/>
+        <ImageGallery searchQuery={this.state.searchQuery} photos={this.state.photos} />
       </div>
     );
   }
