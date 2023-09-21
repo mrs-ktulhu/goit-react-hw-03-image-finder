@@ -9,22 +9,24 @@ export class App extends Component {
     photos: [],
   };
 
-handleSearch = async (searchQuery) => {
-  try {
-    const images = await fetchImages(searchQuery); 
-    this.setState({ photos: images, searchQuery}); 
-  } catch (error) {
-    console.error('Ошибка при запросе:', error);
-  }
-}
-
- 
+  handleSearch = async searchQuery => {
+    try {
+      const images = await fetchImages(searchQuery);
+      this.setState({ photos: images, searchQuery });
+    } catch (error) {
+      console.error('Ошибка при запросе:', error);
+    }
+  };
 
   render() {
     return (
       <div className="App">
-        <Searchbar handleSearch={this.handleSearch}/>
-        <ImageGallery searchQuery={this.state.searchQuery} photos={this.state.photos} />
+        <Searchbar handleSearch={this.handleSearch} />
+        <ImageGallery
+          searchQuery={this.state.searchQuery}
+          photos={this.state.photos}
+          handleSearch={this.handleSearch}
+        />
       </div>
     );
   }
