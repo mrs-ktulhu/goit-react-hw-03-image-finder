@@ -2,37 +2,43 @@ import React, { Component } from 'react';
 import '../../src/styles.css';
 import { fetchImages } from '../api';
 import { MagnifyingGlass } from 'react-loader-spinner';
-import { ImageGalleryItem } from './ImageGalleryItem';
-import { Button } from './Button';
+import ImageGalleryItem from './ImageGalleryItem'; 
+import Button from './Button';
 
-export class ImageGallery extends Component {
+class ImageGallery extends Component {
   state = {
-    photos: null,
+    photos: [],
     searchQuery: null,
     isLoading: false,
-    page:1
+    page: 1,
+    selectedImage: '', 
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchQuery !== this.props.searchQuery)
-      this.setState({ isLoading: true });
-    setTimeout(() => {
-      this.fetchImages(this.props.searchQuery).finally(() => {
-        this.setState({ isLoading: false });
-      });
-    }, '2000');
+    if (prevProps.searchQuery !== this.props.searchQuery) {
+      this.setState({ isLoading: true, photos: [], page: 1 });
+      this.fetchImages(this.props.searchQuery, 1);
+    }
   }
 
-  fetchImages = async searchQuery => {
+  fetchImages = async (searchQuery, page) => {
     try {
-      const images = await fetchImages(searchQuery);
-      this.setState({ photos: images, searchQuery });
+      const images = await fetchImages(searchQuery, page);
+      this.setState((prevState) => ({
+        photos: [...prevState.photos, ...images],
+        searchQuery,
+        page: page + 1,
+        isLoading: false,
+      }));
     } catch (error) {
       console.error('Ошибка при запросе:', error);
     }
   };
-  
-  handleClickLoadMore
+
+  handleClickLoadMore = () => {
+    this.setState({ isLoading: true });
+    this.fetchImages(this.state.searchQuery, this.state.page);
+  };
 
   render() {
     const { photos, isLoading } = this.state;
@@ -40,23 +46,25 @@ export class ImageGallery extends Component {
     return (
       <>
         {isLoading && <MagnifyingGlass />}
-        {photos && (
+        {photos.length > 0 && (
           <>
-            {' '}
             <ul className="ImageGallery">
-              {photos &&
-                photos.map(({ id, webformatURL }) => (
-                  <ImageGalleryItem
-                    id={id}
-                    key={id}
-                    webformatURL={webformatURL}
-                  />
-                ))}
+              {photos.map(({ id, webformatURL, largeImageURL }) => (
+                <ImageGalleryItem
+                  id={id}
+                  key={id}
+                  webformatURL={webformatURL}
+                  largeImageURL={largeImageURL}
+                  openModal={() => this.openModal(largeImageURL)} 
+                />
+              ))}
             </ul>
-            <Button />
+            <Button onClick={this.handleClickLoadMore}>Загрузить больше</Button>
           </>
         )}
       </>
     );
   }
 }
+
+export default ImageGallery;

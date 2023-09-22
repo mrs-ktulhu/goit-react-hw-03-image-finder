@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 export const API_KEY = '39516513-b2de4558649c1d6b4380e040e';
@@ -12,18 +11,19 @@ export const defaultParams = {
   orientation: 'horizontal',
 };
 
-export const buildPixabayURL = (searchQuery) => {
+export const buildPixabayURL = (searchQuery, page) => {
   const queryParams = {
     ...defaultParams,
     key: API_KEY,
     q: searchQuery,
+    page, 
   };
   return `${BASE_URL}?${new URLSearchParams(queryParams).toString()}`;
 };
 
-export const fetchImages = async (searchQuery) => {
+export const fetchImages = async (searchQuery, page) => {
   try {
-    const response = await axios.get(buildPixabayURL(searchQuery));
+    const response = await axios.get(buildPixabayURL(searchQuery, page));
     if (response.status === 200) {
       const data = response.data;
       const formattedImages = data.hits.map((image) => ({
