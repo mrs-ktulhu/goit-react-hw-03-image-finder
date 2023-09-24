@@ -12,23 +12,6 @@ export class App extends Component {
     selectedImage: '',
   };
 
-  componentDidMount() {
-   
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-   
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
-
-  handleKeyDown = (e) => {
-  
-    if (e.key === 'Escape' && this.state.showModal) {
-      this.closeModal();
-    }
-  };
-
   handleSearch = async (searchQuery) => {
     try {
       const images = await fetchImages(searchQuery);
@@ -46,8 +29,9 @@ export class App extends Component {
     this.setState({ showModal: false, selectedImage: '' });
   };
 
+
   render() {
-    const { showModal, selectedImage } = this.state;
+    const { showModal, selectedImage,closeModal } = this.state;
 
     return (
       <div className="App">
@@ -61,7 +45,7 @@ export class App extends Component {
         {showModal && (
           <Modal
             isOpen={showModal}
-            onClose={this.closeModal}
+            onClose={closeModal}
             imageSrc={selectedImage}
             imageAlt="Large Image"
           />
