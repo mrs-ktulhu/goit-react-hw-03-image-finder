@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Overlay, Modals } from './Modal.styled';
 
 
 class Modal extends Component {
@@ -22,11 +23,11 @@ class Modal extends Component {
   render() {
     return (
       this.props.isOpen && (
-        <div className="overlay" onClick={this.props.onClose}>
-          <div className="modal">
+        <Overlay onClick={this.props.onClose}>
+          <Modals>
             <img src={this.props.imageSrc} alt={this.props.imageAlt} />
-          </div>
-        </div>
+          </Modals>
+        </Overlay>
       )
     );
   }

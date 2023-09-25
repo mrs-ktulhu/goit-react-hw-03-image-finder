@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import '../../src/styles.css';
-import { fetchImages } from '../api';
-import { MagnifyingGlass } from 'react-loader-spinner';
+import { fetchImages } from '../../api';
+import { ImagesGallery } from './ImagesGallery.styled';
 import ImageGalleryItem from './ImageGalleryItem'; 
-import Button from './Button';
+import Button from '../Buton/Button';
 
 class ImageGallery extends Component {
   state = {
@@ -22,7 +21,6 @@ class ImageGallery extends Component {
   }
 
   fetchImages = async (searchQuery, page) => {
-    try {
       const images = await fetchImages(searchQuery, page);
       this.setState((prevState) => ({
         photos: [...prevState.photos, ...images],
@@ -30,9 +28,6 @@ class ImageGallery extends Component {
         page: page + 1,
         isLoading: false,
       }));
-    } catch (error) {
-      console.error('Ошибка при запросе:', error);
-    }
   };
 
   handleClickLoadMore = () => {
@@ -41,14 +36,13 @@ class ImageGallery extends Component {
   };
 
   render() {
-    const { photos, isLoading } = this.state;
+    const { photos } = this.state;
 
     return (
       <>
-        {isLoading && <MagnifyingGlass />}
         {photos.length > 0 && (
           <>
-            <ul className="ImageGallery">
+            <ImagesGallery>
               {photos.map(({ id, webformatURL, largeImageURL }) => (
                 <ImageGalleryItem
                   id={id}
@@ -58,7 +52,7 @@ class ImageGallery extends Component {
                   openModal={() => this.openModal(largeImageURL)} 
                 />
               ))}
-            </ul>
+            </ImagesGallery>
             <Button onClick={this.handleClickLoadMore}>Загрузить больше</Button>
           </>
         )}

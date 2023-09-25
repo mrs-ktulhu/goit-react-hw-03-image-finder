@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../../src/styles.css';
+import { ImagesGalleryItem, ImagesGalleryImg } from './ImagesGallery.styled';
 import * as basicLightbox from 'basiclightbox';
 import 'basiclightbox/dist/basicLightbox.min.css';
 
@@ -19,14 +19,13 @@ class ImageGalleryItem extends Component {
     const { webformatURL } = this.props;
 
     return (
-      <li className="ImageGalleryItem">
-        <img
+      <ImagesGalleryItem>
+        <ImagesGalleryImg
           src={webformatURL}
           alt="Gallery Item"
-          className="ImageGalleryItem-image"
           onClick={this.handleOpenModal}
         />
-      </li>
+      </ImagesGalleryItem>
     );
   }
 }

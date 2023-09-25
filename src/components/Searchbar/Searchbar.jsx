@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BsSearch } from 'react-icons/bs';
-import '../../src/styles.css';
+import { Searchbars, Searchform,SearchButton,SearchButtonLabel,SearchInput } from './Searchbar.styled';
 
 export class Searchbar extends Component {
   state = {
@@ -12,24 +12,17 @@ export class Searchbar extends Component {
     this.setState({ [name]: value });
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.handleSearch(this.state.searchQuery);
-  };
-
   render() {
     return (
-      <header className="Searchbar">
-        <form className="SearchForm" role="search" onSubmit={this.handleSubmit}>
-          <button type="submit" className="SearchForm-button">
+      <Searchbars>
+        <Searchform role="search" onSubmit={this.handleSubmit}>
+          <SearchButton type="submit" >
             <BsSearch>
-              {' '}
-              <span className="SearchForm-button-label">Search</span>
+              <SearchButtonLabel>Search</SearchButtonLabel>
             </BsSearch>
-          </button>
+          </SearchButton>
 
-          <input
-            className="SearchForm-input"
+          <SearchInput
             type="text"
             autoComplete="off"
             autoFocus
@@ -38,8 +31,8 @@ export class Searchbar extends Component {
             value={this.state.searchQuery}
             onChange={this.handleChange}
           />
-        </form>
-      </header>
+        </Searchform>
+      </Searchbars>
     );
   }
 }
