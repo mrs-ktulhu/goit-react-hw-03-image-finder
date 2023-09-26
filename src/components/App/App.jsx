@@ -3,8 +3,9 @@ import { Searchbar } from '../Searchbar/Searchbar';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Modal from '../Modal/Modal';
 import Loader from '../Loader';
-import { AppStyled} from './App.styled';
-
+import { AppStyled } from './App.styled';
+import Button from 'components/Buton/Button';
+import { fetchImages } from 'api';
 
 export class App extends Component {
   state = {
@@ -12,8 +13,8 @@ export class App extends Component {
     showModal: false,
     selectedImage: '',
     isLoading: false,
+    searchQuery: null,
   };
-
 
   openModal = imageSrc => {
     this.setState({ showModal: true, selectedImage: imageSrc });
@@ -23,35 +24,46 @@ export class App extends Component {
     this.setState({ showModal: false, selectedImage: '' });
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchQuery !== this.props.searchQuery) {
-      this.setState({ isLoading: true, photos: [], page: 1 });
-      this.fetchImages(this.props.searchQuery, 1);
+  handleClickLoadMore = async () => {
+    this.setState((prevState) => ({
+      page: prevState.page + 1, 
+    }));
+  };
+
+  handleSearch = async (searchQuery) => {
+    try {
+      const images = await fetchImages(searchQuery);
+      this.setState({ photos: images, searchQuery });
+    } catch (error) {
+      console.error('Ошибка при запросе:', error);
     }
-  }
+  };
 
-  render() {
-    const { showModal, selectedImage, closeModal, isLoading } = this.state;
+render() {
+  const { showModal, selectedImage, closeModal, isLoading, photos } = this.state;
 
-    return (
-      <AppStyled>
-        <Searchbar />
-        {isLoading && <Loader />}
-        <ImageGallery
-          searchQuery={this.state.searchQuery}
-          photos={this.state.photos}
-          handleSearch={this.handleSearch}
-          openModal={this.openModal}
+  return (
+    <AppStyled>
+      <Searchbar handleSearch={this.handleSearch}/>
+      {isLoading && <Loader />}
+      <ImageGallery
+        photos={this.state.photos}
+        openModal={this.openModal}
+        searchQuery={this.state.searchQuery}
+      />
+      {showModal && (
+        <Modal
+          isOpen={showModal}
+          onClose={closeModal}
+          imageSrc={selectedImage}
+          imageAlt="Large Image"
         />
-        {showModal && (
-          <Modal
-            isOpen={showModal}
-            onClose={closeModal}
-            imageSrc={selectedImage}
-            imageAlt="Large Image"
-          />
-        )}
-      </AppStyled>
-    );
-  }
+      )}
+
+      {photos.length > 0 && (
+        < Button onClick={this.handleClickLoadMore}/>
+      )}
+    </AppStyled>
+  );
+}
 }

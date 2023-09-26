@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { fetchImages } from '../../api';
 import { ImagesGallery } from './ImagesGallery.styled';
 import ImageGalleryItem from './ImageGalleryItem'; 
-import Button from '../Buton/Button';
 
 class ImageGallery extends Component {
   state = {
@@ -30,11 +29,6 @@ class ImageGallery extends Component {
       }));
   };
 
-  handleClickLoadMore = () => {
-    this.setState({ isLoading: true });
-    this.fetchImages(this.state.searchQuery, this.state.page);
-  };
-
   render() {
     const { photos } = this.state;
 
@@ -53,7 +47,6 @@ class ImageGallery extends Component {
                 />
               ))}
             </ImagesGallery>
-            <Button onClick={this.handleClickLoadMore}>Загрузить больше</Button>
           </>
         )}
       </>
