@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Notiflix from 'notiflix';
 
 export const API_KEY = '39516513-b2de4558649c1d6b4380e040e';
 
@@ -16,7 +17,7 @@ export const buildPixabayURL = (searchQuery, page) => {
     ...defaultParams,
     key: API_KEY,
     q: searchQuery,
-    page, 
+    page
   };
   return `${BASE_URL}?${new URLSearchParams(queryParams).toString()}`;
 };
@@ -24,17 +25,19 @@ export const buildPixabayURL = (searchQuery, page) => {
 export const fetchImages = async (searchQuery, page) => {
   try {
     const response = await axios.get(buildPixabayURL(searchQuery, page));
-    if (response.status === 200) {
-      const data = response.data;
-      const formattedImages = data.hits.map((image) => ({
+    const data = response.data;
+    if (response.status !== 200) {
+      Notiflix.Notify.failure('Oops...nothing was found');
+      throw new Error('Error fetching images');
+    } else {
+      return data.hits.map((image) => ({
         id: image.id,
         webformatURL: image.webformatURL,
         largeImageURL: image.largeImageURL,
       }));
-      return formattedImages;
     }
   } catch (error) {
-    console.error('Ошибка при запросе:', error);
-    throw error;
+    console.error('Error fetching images:', error);
+    throw error; 
   }
 };

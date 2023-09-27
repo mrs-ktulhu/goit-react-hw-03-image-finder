@@ -1,9 +1,9 @@
 import React from 'react';
 import { Buttons } from './Button.styled';
 
-const Button = ({ onClick }) => (
+const Button = ({ onClick, children }) => (
   <Buttons type="button" onClick={onClick}>
-    LOAD MORE
+    {children}
   </Buttons>
 );
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Notiflix from 'notiflix';
 import { BsSearch } from 'react-icons/bs';
 import { Searchbars, Searchform,SearchButton,SearchButtonLabel,SearchInput } from './Searchbar.styled';
 
@@ -12,11 +13,19 @@ export class Searchbar extends Component {
     this.setState({ [name]: value });
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
-    this.props.handleSearch(this.state.searchQuery);
-  };
 
+    const { searchQuery } = this.state;
+
+    if (searchQuery.trim() === '') {
+      Notiflix.Notify.failure('Please enter a search query');
+    }
+    else {
+      this.props.handleFormSubmit(searchQuery);
+      this.setState({ searchQuery: '' });
+    }
+  };
 
   render() {
     return (

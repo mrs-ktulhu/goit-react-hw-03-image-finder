@@ -1,19 +1,33 @@
 import React, { Component } from 'react';
+import { fetchImages } from 'api';
+import Button from 'components/Buton/Button';
 import { Searchbar } from '../Searchbar/Searchbar';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Modal from '../Modal/Modal';
 import Loader from '../Loader';
 import { AppStyled } from './App.styled';
-import Button from 'components/Buton/Button';
-import { fetchImages } from 'api';
 
 export class App extends Component {
   state = {
     photos: [],
     showModal: false,
-    selectedImage: '',
+    largeImageUrl: '',
     isLoading: false,
-    searchQuery: null,
+    searchQuery: '',
+    page: 1,
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.query !== this.state.query ||
+      prevState.page !== this.state.page
+    ) {
+      this.fetchImages();
+    }
+  }
+
+  handleFormSubmit = query => {
+    this.setState({ query, page: 1, images: [] });
   };
 
   openModal = imageSrc => {
@@ -24,46 +38,69 @@ export class App extends Component {
     this.setState({ showModal: false, selectedImage: '' });
   };
 
-  handleClickLoadMore = async () => {
-    this.setState((prevState) => ({
-      page: prevState.page + 1, 
-    }));
+  handleClickLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  handleSearch = async (searchQuery) => {
+  handleSearch = async searchQuery => {
     try {
-      const images = await fetchImages(searchQuery);
-      this.setState({ photos: images, searchQuery });
+      const photos = await fetchImages(searchQuery);
+      this.setState({ photos: photos, searchQuery });
     } catch (error) {
       console.error('Ошибка при запросе:', error);
     }
   };
+  handleImageClick = id => {
+    const clickedImage = this.state.photos.find(photo => photo.id === id);
+    if (clickedImage) {
+      this.setState({
+        largeImageUrl: clickedImage.largeImageURL,
+        showModal: true,
+      });
+    }
+  };
 
-render() {
-  const { showModal, selectedImage, closeModal, isLoading, photos } = this.state;
+  fetchImages = () => {
+    const { query, page } = this.state;
 
-  return (
-    <AppStyled>
-      <Searchbar handleSearch={this.handleSearch}/>
-      {isLoading && <Loader />}
-      <ImageGallery
-        photos={this.state.photos}
-        openModal={this.openModal}
-        searchQuery={this.state.searchQuery}
-      />
-      {showModal && (
-        <Modal
-          isOpen={showModal}
-          onClose={closeModal}
-          imageSrc={selectedImage}
-          imageAlt="Large Image"
+    this.setState({ loading: true });
+
+    fetchImages(query, page)
+      .then(photos => {
+        this.setState(prevState => ({
+          photos: [...prevState.photos, ...photos],
+          loading: false,
+        }));
+      })
+      .catch(error => {
+        console.log('Error fetching images:', error);
+        this.setState({ loading: false });
+      });
+  };
+
+  render() {
+    const { showModal, isLoading, photos, largeImageUrl } = this.state;
+
+    return (
+      <AppStyled>
+        <Searchbar handleFormSubmit={this.handleFormSubmit} />
+        {isLoading && <Loader />}
+        <ImageGallery
+          photos={photos}
+          onPhotoClick={this.handleImageClick}
+          searchQuery={this.state.searchQuery}
         />
-      )}
-
-      {photos.length > 0 && (
-        < Button onClick={this.handleClickLoadMore}/>
-      )}
-    </AppStyled>
-  );
-}
+        {!!photos.length && !isLoading && (
+          <Button onClick={this.handleClickLoadMore}>Load more</Button>
+        )}
+        {showModal && (
+          <Modal
+            largeImageUrl={largeImageUrl}
+            alt="Large Image"
+            onClose={this.closeModal}
+          />
+        )}
+      </AppStyled>
+    );
+  }
 }

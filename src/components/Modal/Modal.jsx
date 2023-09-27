@@ -4,13 +4,6 @@ import { Overlay, Modals } from './Modal.styled';
 
 class Modal extends Component {
 
-  handleKeyDown = (e) => {
-    console.log('Key pressed:', e.key);
-    if (e.key === 'Esc' || e.key === 'Escape') {
-      this.closeModal();
-    }
-  };
-
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown);
   }
@@ -19,17 +12,29 @@ class Modal extends Component {
     window.removeEventListener('keydown', this.handleKeyDown);
   }
 
+  handleKeyDown = e => {
+    if (e.code === 'Escape') {
+      this.props.onClose();
+    }
+  };
+
+  handleBackdropClick = e => {
+    if (e.target === e.currentTarget) {
+      this.props.onClose();
+    }
+  };
+
 
   render() {
+    const { largeImageUrl, alt } = this.props;
     return (
-      this.props.isOpen && (
-        <Overlay onClick={this.props.onClose}>
-          <Modals>
-            <img src={this.props.imageSrc} alt={this.props.imageAlt} />
-          </Modals>
-        </Overlay>
+      <Overlay onClick={this.handleBackdropClick}>
+        <Modals>
+          <img src={largeImageUrl} alt={alt} />
+        </Modals>
+      </Overlay>
       )
-    );
+    ;
   }
 }
 
