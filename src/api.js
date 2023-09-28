@@ -1,5 +1,4 @@
-import axios from 'axios';
-import Notiflix from 'notiflix';
+import axios from 'axios'
 
 export const API_KEY = '39516513-b2de4558649c1d6b4380e040e';
 
@@ -26,16 +25,11 @@ export const fetchImages = async (searchQuery, page) => {
   try {
     const response = await axios.get(buildPixabayURL(searchQuery, page));
     const data = response.data;
-    if (response.status !== 200) {
-      Notiflix.Notify.failure('Oops...nothing was found');
-      throw new Error('Error fetching images');
-    } else {
       return data.hits.map((image) => ({
         id: image.id,
         webformatURL: image.webformatURL,
         largeImageURL: image.largeImageURL,
       }));
-    }
   } catch (error) {
     console.error('Error fetching images:', error);
     throw error; 

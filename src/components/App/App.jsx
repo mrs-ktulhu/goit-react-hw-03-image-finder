@@ -27,7 +27,7 @@ export class App extends Component {
   }
 
   handleFormSubmit = query => {
-    this.setState({ query, page: 1, images: [] });
+    this.setState({ query, page: 1, photos: [] });
   };
 
   openModal = imageSrc => {
@@ -40,16 +40,14 @@ export class App extends Component {
 
   handleClickLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
-  };
+  }
 
   handleSearch = async searchQuery => {
-    try {
+
       const photos = await fetchImages(searchQuery);
       this.setState({ photos: photos, searchQuery });
-    } catch (error) {
-      console.error('Ошибка при запросе:', error);
-    }
-  };
+    } 
+
   handleImageClick = id => {
     const clickedImage = this.state.photos.find(photo => photo.id === id);
     if (clickedImage) {
@@ -63,20 +61,24 @@ export class App extends Component {
   fetchImages = () => {
     const { query, page } = this.state;
 
-    this.setState({ loading: true });
+    this.setState({ isLoading: true });
 
     fetchImages(query, page)
       .then(photos => {
         this.setState(prevState => ({
           photos: [...prevState.photos, ...photos],
-          loading: false,
+          isLoading: false,
         }));
       })
       .catch(error => {
         console.log('Error fetching images:', error);
-        this.setState({ loading: false });
+        this.setState({ isLoading: false });
       });
-  };
+      // window.scrollTo({
+      //   top: page,
+      //   behavior: "smooth",
+      // })
+  }
 
   render() {
     const { showModal, isLoading, photos, largeImageUrl } = this.state;
@@ -90,8 +92,8 @@ export class App extends Component {
           onPhotoClick={this.handleImageClick}
           searchQuery={this.state.searchQuery}
         />
-        {!!photos.length && !isLoading && (
-          <Button onClick={this.handleClickLoadMore}>Load more</Button>
+        {!!photos.length && (
+          <Button onClick={this.handleClickLoadMore}/>
         )}
         {showModal && (
           <Modal
