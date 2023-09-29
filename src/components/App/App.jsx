@@ -40,22 +40,15 @@ export class App extends Component {
 
   handleClickLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
-  }
+  };
 
   handleSearch = async searchQuery => {
+    const photos = await fetchImages(searchQuery);
+    this.setState({ photos: photos, searchQuery });
+  };
 
-      const photos = await fetchImages(searchQuery);
-      this.setState({ photos: photos, searchQuery });
-    } 
-
-  handleImageClick = id => {
-    const clickedImage = this.state.photos.find(photo => photo.id === id);
-    if (clickedImage) {
-      this.setState({
-        largeImageUrl: clickedImage.largeImageURL,
-        showModal: true,
-      });
-    }
+  handleImageClick = (largeImageUrl) => {
+    this.setState({ largeImageUrl, showModal: true });
   };
 
   fetchImages = () => {
@@ -67,18 +60,19 @@ export class App extends Component {
       .then(photos => {
         this.setState(prevState => ({
           photos: [...prevState.photos, ...photos],
-          isLoading: false,
         }));
       })
       .catch(error => {
         console.log('Error fetching images:', error);
+      })
+      .finally(() => {
         this.setState({ isLoading: false });
       });
-      // window.scrollTo({
-      //   top: page,
-      //   behavior: "smooth",
-      // })
-  }
+    // window.scrollTo({
+    //   top: page,
+    //   behavior: "smooth",
+    // })
+  };
 
   render() {
     const { showModal, isLoading, photos, largeImageUrl } = this.state;
@@ -86,20 +80,18 @@ export class App extends Component {
     return (
       <AppStyled>
         <Searchbar handleFormSubmit={this.handleFormSubmit} />
-        {isLoading && <Loader />}
         <ImageGallery
           photos={photos}
           onPhotoClick={this.handleImageClick}
           searchQuery={this.state.searchQuery}
         />
-        {!!photos.length && (
-          <Button onClick={this.handleClickLoadMore}/>
-        )}
+        {isLoading && <Loader />}
+        {!!photos.length && !isLoading &&   <Button onClick={this.handleClickLoadMore} />}
         {showModal && (
           <Modal
             largeImageUrl={largeImageUrl}
             alt="Large Image"
-            onClose={this.closeModal}
+            onClose={this.closeModal} 
           />
         )}
       </AppStyled>

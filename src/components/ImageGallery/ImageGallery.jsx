@@ -11,7 +11,8 @@ const ImageGallery = ({ photos, onPhotoClick }) => (
         key={photo.webformatURL}
         imageUrl={photo.webformatURL}
         alt={photo.alt}
-        onClick={() => onPhotoClick(photo.id)}
+        onPhotoClick={onPhotoClick}
+        largeImageUrl={photo.largeImageURL}
       />
     ))}
   </ImagesGallery>
